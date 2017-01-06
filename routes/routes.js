@@ -44,7 +44,7 @@ router.route('/movies')
 
 // /movies/:title route to get specific movie and put to update
 //TODO make unique movieId and assign to Mongo _id
-router.route('/movies/:title')
+router.route('/movies/:_id')
     .get(function(req, res) {
         var query = {_id: req.params._id};
         Movie.findOne(query, function(err, movie) {
@@ -74,6 +74,7 @@ router.route('/movies/:title')
     })
 
     .delete(function(req, res) {
+        console.log('>>> ', req.params)
         Movie.remove({
             _id: req.params._id
         }, function(err, movie) {
