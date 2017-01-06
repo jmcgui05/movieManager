@@ -12,10 +12,6 @@ var mongoose = require('mongoose');
 mongoose.Promise = global.Promise; //temp fix for mongoose promise deprecation warning
 mongoose.connect(config.url);
 
-// app.get('/', function(req, res) {
-//     res.sendfile('index.html');
-// });
-
 // use body parser to parse requests
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
