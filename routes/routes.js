@@ -24,14 +24,17 @@ router.route('/movies')
 
         //save the movie and checkfor errors
         movie.save(function(err) {
-            if (err) res.send(err);
-
-            res.json({message: "Movie created!"});
+            if (err) {
+                res.send(err);
+            } else {
+                res.json({message: "Movie created!"});
+            }    
         });
 
     })
     
     .get(function(req, res) {
+        
         Movie.find(function(err, movies) {
             if (err) res.send(err);
 
@@ -43,7 +46,7 @@ router.route('/movies')
 //TODO make unique movieId and assign to Mongo _id
 router.route('/movies/:title')
     .get(function(req, res) {
-        var query = {title: req.params.title};
+        var query = {_id: req.params._id};
         Movie.findOne(query, function(err, movie) {
             if (err) res.send(err);
 
@@ -53,7 +56,7 @@ router.route('/movies/:title')
 
     .put(function(req, res) {
         
-        var query = {title: req.params.title};
+        var query = {_id: req.params._id};
         Movie.findOne(query, function(err, movie) {
             if (err) res.send(err);
 
@@ -70,12 +73,14 @@ router.route('/movies/:title')
         });
     })
 
-    .delete(function(req,res) {
-        var query = {title: req.params.title};
-        Movie.remove(query, function(err, movie) {
-            if (err) res.send(err);
+    .delete(function(req, res) {
+        Movie.remove({
+            _id: req.params._id
+        }, function(err, movie) {
+            if (err)
+                res.send(err);
 
-            res.json({message: "Successfully deleted Movie"});
+            res.json({ message: 'Successfully deleted' });
         });
     });
 
