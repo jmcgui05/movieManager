@@ -1,5 +1,3 @@
 # movieManager
 
-"STARTED: 3:15pm Wednesday January 4 2017"
-
-Finished app will be on dev branch
+A simple application to manage a movie list. Add, delete movies from your list. Actions update DB via a RESTful API. Run branch React or jQuery to see different implementations.
