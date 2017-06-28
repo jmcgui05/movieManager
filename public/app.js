@@ -1,7 +1,32 @@
-    class Hello extends React.Component {
-        componentWillMount() {
-            return console.log('In componentWillMount')
+    class MoviesList extends React.Component {
+        constructor(props) {
+            super(props);
+
+            this.state = {}
+
         }
+        componentWillMount() {
+            console.log('In Mount');
+            var list;
+            $.ajax({
+                url: 'http://localhost:8080/api/movies',
+                type: 'GET',
+                async: false,
+                success: function(result) {
+                    list = result;
+                }
+            });
+            this.setState({movies: list})
+        }
+
+        actionGetAllMovies() {
+            var list;
+                $.get( "http://localhost:8080/api/movies", function( movieList ) {
+                    list = movieList;
+                })
+                this.setState({movies: list});
+        }
+
         handleSubmit() {
             let movie = {
                 title: this.title.value,
@@ -10,43 +35,53 @@
                 actors: this.actors.value.split(','),
                 rating: this.rating.value
             }
-            console.log(movie);
-
+            this.state.movies.push(movie);
+            this.setState({movies: this.state.movies});
             $.post( "http://localhost:8080/api/movies", movie );
+            $('#title').val("");
+            $('#genre').val("");
+            $('#year').val("");
+            $('#actors').val("");
+            $('#rating').val("");
         }
 
-        handleDelete() {
-            let deleteId = this.deleteMovie.value;
+        handleDelete(movie) {
+            let deleteId = movie._id;
+            this.state.movies.splice(this.state.movies.indexOf(movie), 1);
+            this.setState({movies: this.state.movies});
+
             $.ajax({
-                url: 'http://localhost:8080/api/movies/' + deleteTitle,
+                url: 'http://localhost:8080/api/movies/' + movie._id,
                 type: 'DELETE',
                 success: function(result) {
                 }
             });
         }
 
-        handleGetMovies() {
-            $.get( "http://localhost:8080/api/movies", function( movies ) {
-                movies.forEach(function( movie ) {
-                    $('#movieList').append('<tr><td>' + movie.title + '</td><td>' + movie.genre + '</td><td>' + movie.year + 
-                    '</td><td>' + movie.actors + '</td><td>' + movie.rating + '</td><td><button id=' + movie._id + 
-                    'onClick={this.handleDelete.bind(this.id)}' +'>Delete Title</button></td></tr>');
-                })
-            });
-        }
-
         render() {
+            const movies = this.state.movies; 
+            var self = this;
+            const movieNode = movies.map(function(mov) {
+                return (
+                    <tr>
+                    <td key={mov._id}>{mov.title}</td><td>{mov.genre}</td><td>{mov.year}</td><td>{mov.actors}</td><td>{mov.rating}</td><td><button onClick={self.handleDelete.bind(self, mov)}>Delete</button></td>
+                    </tr>
+                )
+            })
             return (   
-                <div>     
+
+                <div>  
+                    <h1>Movie Manager</h1>   
                     <input placeholder="Title" id="title" type="text" ref={(input) => { this.title = input; }}/>  
                     <input placeholder="Genre" id="genre" type="text" ref={(input) => { this.genre = input; }}/> 
                     <input placeholder="Year" id="year" type="text" ref={(input) => { this.year = input; }}/> 
                     <input placeholder="Rober De Niro, Joe Pesci" id="actors" type="text" ref={(input) => { this.actors = input; }}/> 
                     <input placeholder="Rating" id="rating" type="text" ref={(input) => { this.rating = input; }}/> 
-                    <button onClick={this.handleSubmit.bind(this)}>Add</button><br></br>
-                    <button onClick={this.handleGetMovies.bind(this)}>Show All Movies</button>
+                    <button onClick={this.handleSubmit.bind(this)} id="submitButton">Add</button>
+                    <button onClick={this.actionGetAllMovies.bind(this)} id="getButton">Show All</button>
+                    <div><br></br></div>
 
-                    <table id ="movieList" className="table table-striped">
+                    <table id='movieList' ref={(list) => { this.movieList = list;}}>
                     <tbody>
                         <tr>
                             <th>Title</th>
@@ -56,15 +91,17 @@
                             <th>Rating</th>
                             <th>Actions</th>
                         </tr>
+                            {movieNode}
                     </tbody>
                     </table>
-
+                    <ul>
+                    </ul>
                 </div>  
             )
         }
     };
 
     ReactDOM.render(
-        <Hello name="World" />,
+        <MoviesList/>,
         document.getElementById('container')
     );
